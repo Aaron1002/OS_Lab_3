@@ -51,11 +51,11 @@ void *thread(void *arg){
             res = 0;
             for(int k=0; k<matrix_row_y; k++){
                 /*YOUR CODE HERE*/
-
+                res += x[i][k] * y[k][j];
                 /****************/
             }
             fprintf(fptr3, "%d ", res);
-            if(j==matrix_col_y-1) fprintf(fptr3, "\n");        
+            if(j==matrix_col_y-1) fprintf(fptr3, "\n"); // change to next row
         }
     }
     return NULL;
@@ -63,10 +63,12 @@ void *thread(void *arg){
 
 
 int main(){
-    x = malloc(sizeof(int*)*matrix_row_x);
+    /* Create array m1 */
+    x = malloc(sizeof(int*)*matrix_row_x);  
     for(int i=0; i<matrix_row_x; i++){
         x[i] = malloc(sizeof(int)*matrix_col_x);
     }
+    /* Create array m2 */
     y = malloc(sizeof(int*)*matrix_row_y);
     for(int i=0; i<matrix_row_y; i++){
         y[i] = malloc(sizeof(int)*matrix_col_y);

@@ -73,10 +73,12 @@ void *thread2(void *arg) {
 }
 
 int main() {
+    /* Create array m1 */
     x = malloc(sizeof(int*)*matrix_row_x);
     for(int i=0; i<matrix_row_x; i++){
         x[i] = malloc(sizeof(int)*matrix_col_x);
     }
+    /* Create array m2 */
     y = malloc(sizeof(int*)*matrix_row_y);
     for(int i=0; i<matrix_row_y; i++){
         y[i] = malloc(sizeof(int)*matrix_col_y);
