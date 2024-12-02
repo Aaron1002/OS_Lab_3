@@ -50,7 +50,10 @@ void *thread1(void *arg){
     for(int i=0; i<matrix_row_x; i++){
         for(int j=0; j<matrix_col_y; j++){
             for(int k=0; k<matrix_row_y/2; k++){
-
+                int temp = x[i][k] * y[k][j]; 
+                pthread_spin_lock(&lock);
+                z[i][j] += temp;
+                pthread_spin_unlock(&lock); 
             }      
         }
     }
@@ -64,7 +67,10 @@ void *thread2(void *arg) {
     for(int i=0; i<matrix_row_x; i++){
         for(int j=0; j<matrix_col_y; j++){
             for(int k=matrix_row_y/2; k<matrix_row_y; k++){
-
+                int temp = x[i][k] * y[k][j];
+                pthread_spin_lock(&lock); 
+                z[i][j] += temp; 
+                pthread_spin_unlock(&lock); 
             }     
         }
     } 
@@ -73,16 +79,17 @@ void *thread2(void *arg) {
 }
 
 int main() {
-    /* Create array m1 */
+    /* Create matrix m1 */
     x = malloc(sizeof(int*)*matrix_row_x);
     for(int i=0; i<matrix_row_x; i++){
         x[i] = malloc(sizeof(int)*matrix_col_x);
     }
-    /* Create array m2 */
+    /* Create matrix m2 */
     y = malloc(sizeof(int*)*matrix_row_y);
     for(int i=0; i<matrix_row_y; i++){
         y[i] = malloc(sizeof(int)*matrix_col_y);
     }
+    /* Result matrix */
     z = malloc(sizeof(int*)*matrix_row_x);
     for(int i=0; i<matrix_row_x; i++){
         z[i] = malloc(sizeof(int)*matrix_col_y);
