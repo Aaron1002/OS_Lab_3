@@ -16,7 +16,30 @@ static ssize_t Mywrite(struct file *fileptr, const char __user *ubuf, size_t buf
 
 
 static ssize_t Myread(struct file *fileptr, char __user *ubuf, size_t buffer_len, loff_t *offset){
+    // (info that kernel passed, kernel write info to buffer, max read size user requested, offset)
     /*Your code here*/
+    struct task_struct *task = current; // access current thread info
+    struct task_struct *thread;
+    int len = 0;    // the location to place the next data 
+
+    // read thread info into buffer
+    for_each_thread(current, thread){
+        if (current->pid == thread->pid){   // do not print the main thread
+            continue;
+        }
+        // (obj buffer location, max buffer size)
+        len += snprintf(buf + len, BUFSIZE, "PID: %d, TID: %d, Prio: %d, State: %d\n",
+                        current->pid, thread->pid, thread->prio, thread->__state);
+    }
+
+    // copy data from kernel space to user space
+    if (*offset >= len) {   
+        return 0;
+    }
+    copy_to_user(ubuf, buf, len);   // (pass proc_buf to ubuf in user mode)
+
+    *offset = strlen(buf); // update offset
+    return strlen(buf);
 
     /****************/
 }
