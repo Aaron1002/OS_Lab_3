@@ -73,13 +73,18 @@ void *thread1(void *arg){
 
     /*YOUR CODE HERE*/
     /* Hint: Write data into proc file.*/
-
+    int fd = open("/proc/Mythread_info", O_WRONLY);
+    if (fd != -1){  // opening success
+        write(fd, data, strlen(data));  // write msg into fd(/proc) (call Mywrite())
+        close(fd);
+    }
     /****************/ 
 
     char buffer[50]; 
     while (fgets(buffer, sizeof(buffer), fptr4) != NULL){
-        printf("%s", buffer);
+        printf("%s", buffer);   // read data from user buffer
     }
+    
 }
 
 
@@ -97,13 +102,18 @@ void *thread2(void *arg){
     
     /*YOUR CODE HERE*/
     /* Hint: Write data into proc file.*/
-
+    int fd = open("/proc/Mythread_info", O_WRONLY);
+    if (fd != -1){
+        write(fd, data, strlen(data));
+        close(fd);
+    }
     /****************/   
 
     char buffer[50]; 
     while (fgets(buffer, sizeof(buffer), fptr5) != NULL){
         printf("%s", buffer);
-    } 
+    }
+    
 }
 #endif
 

@@ -18,29 +18,42 @@ static ssize_t Mywrite(struct file *fileptr, const char __user *ubuf, size_t buf
 static ssize_t Myread(struct file *fileptr, char __user *ubuf, size_t buffer_len, loff_t *offset){
     // (info that kernel passed, kernel write info to buffer, max read size user requested, offset)
     /*Your code here*/
-    struct task_struct *task = current; // access current thread info
-    struct task_struct *thread;
-    int len = 0;    // the location to place the next data 
 
-    // read thread info into buffer
+    struct task_struct *thread; // PCB
+
+    int len = sizeof(buf); 
+
     for_each_thread(current, thread){
-        if (current->pid == thread->pid){   // do not print the main thread
+        if (current->pid == thread->pid){   // ignore the main thread
             continue;
         }
-        // (obj buffer location, max buffer size)
-        len += snprintf(buf + len, BUFSIZE, "PID: %d, TID: %d, Prio: %d, State: %d\n",
-                        current->pid, thread->pid, thread->prio, thread->__state);
+        snprintf(buf + strlen(buf), BUFSIZE - strlen(buf), "PID: %d, TID: %d, Prio: %d, State: %d\n",
+                    current->pid, thread->pid, thread->prio, thread->__state);
+        /* 
+        snprintf() will override the previous data, so add the new data 
+        at (buf + strlen(buf)) (the location of the last data end)
+        
+        snprintf(add data at which address, MAX size of the data)
+        */
     }
 
-    // copy data from kernel space to user space
-    if (*offset >= len) {   
-        return 0;
-    }
-    copy_to_user(ubuf, buf, len);   // (pass proc_buf to ubuf in user mode)
+    ssize_t ret = len; 
 
-    *offset = strlen(buf); // update offset
-    return strlen(buf);
+    if (*offset >= len || copy_to_user(ubuf, buf, len)) {   // error dealing
+        // copy_to_user(): write the data in kernel buffer into user_buffer
+        
+        pr_info("copy_to_user failed\n");   // print info in kernel (can be looked at kernel log)
 
+        ret = 0; 
+    } 
+    else { 
+        pr_info("procfile read %s\n", fileptr->f_path.dentry->d_name.name); 
+
+        *offset += len; // update the offset
+    } 
+
+    return ret; 
+    
     /****************/
 }
 
